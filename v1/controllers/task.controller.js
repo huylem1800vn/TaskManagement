@@ -18,7 +18,28 @@ module.exports.index = async (req, res) => {
     };
     //Hết sắp xếp
 
-    const tasks = await Task.find(find).sort(sort);
+    //Phân trang
+    const pagination = {
+        limit: 2,
+        page: 1,
+    };
+
+    if(req.query.page) {
+        pagination.page = parseInt(req.query.page);
+    }
+
+    if(req.query.limit) {
+        pagination.limit = parseInt(req.query.limit);
+    }
+
+    const skip = (pagination.page - 1) * pagination.limit;
+    //Hết phân trang
+
+    const tasks = await Task
+    .find(find)
+    .sort(sort)
+    .limit(pagination.limit)
+    .skip(skip);
 
 
     // trả về chuỗi json lên đường link
