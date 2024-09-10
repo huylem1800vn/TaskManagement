@@ -35,6 +35,15 @@ module.exports.index = async (req, res) => {
     const skip = (pagination.page - 1) * pagination.limit;
     //Hết phân trang
 
+    //Tìm kiếm
+    // Thêm regex vào cho tìm kiếm chuẩn hơn
+    if(req.query.keyword) {
+        //Thêm chữ i để không phân biệt chữ hoa chữ thường
+        const regex = new RegExp(req.query.keyword, "i");
+        find.title = regex;
+    }
+    //End tìm kiếm
+
     const tasks = await Task
     .find(find)
     .sort(sort)
