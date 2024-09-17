@@ -97,26 +97,33 @@ module.exports.changeStatus = async (req, res) => {
 
 // [PATCH] /api/v1/tasks/change-multi/:id
 module.exports.changeMulti = async (req, res) => {
-    const { ids, status } = req.body;
-
-    const listStatus = ["initial", "doing", "finish", "pending", "notFinish"];
-
-    // dùng để check xem trạng thái có bao gồm các trạng thái hợp lệ hay không, nếu không có trạng thái hợp lệ sẽ trả ra code 400
-    if(listStatus.includes(status)) {
-        await Task.updateMany({
-            _id: { $in: ids },
-        }, {
-            status: status,
-        });
+    try {
+        const { ids, status } = req.body;
     
-        res.json({
-            code: 200,
-            message: "Đổi trạng thái thành công!",
-        });
-    } else {
+        const listStatus = ["initial", "doing", "finish", "pending", "notFinish"];
+    
+        // dùng để check xem trạng thái có bao gồm các trạng thái hợp lệ hay không, nếu không có trạng thái hợp lệ sẽ trả ra code 400
+        if(listStatus.includes(status)) {
+            await Task.updateMany({
+                _id: { $in: ids },
+            }, {
+                status: status,
+            });
+        
+            res.json({
+                code: 200,
+                message: "Đổi trạng thái thành công!",
+            });
+        } else {
+            res.json({
+                code: 400,
+                message: `Trạng thái ${status} không hợp lệ`,
+            });
+        }
+    } catch (error) {
         res.json({
             code: 400,
-            message: `Trạng thái ${status} không hợp lệ`,
+            message: `Không tồn tại id này`,
         });
     }
 
@@ -135,17 +142,49 @@ module.exports.create = async (req, res) => {
 
 // [PATCH] /api/v1/tasks/edit/:id
 module.exports.edit = async (req, res) => {
-    const id = req.params.id;
-    const data = req.body;
+    try {
+        const id = req.params.id;
+        const data = req.body;
+    
+        await Task.updateOne({
+            _id: id,
+        }, data);
+    
+        res.json({
+            code: 200,
+            message: "Cập nhật công việc thành công!",
+        });
+    } catch (error) {
+        res.json({
+            code: 200,
+            message: "Cập nhật công việc không thành công!",
+        });
+    }
+};
 
-    await Task.updateOne({
-        _id: id,
-    }, data);
-
-    res.json({
-        code: 200,
-        message: "Cập nhật công việc thành công!",
-    });
+// [PATCH] /api/v1/tasks/delete/:id
+module.exports.delete = async (req, res) => {
+    // try catch bắt lỗi nếu nhập sai id để không bị break server
+    try {
+        const id = req.params.id;
+    
+        await Task.updateOne({
+            _id: id,
+        }, {
+            deleted: true,
+            deletedAt: new Date(),
+        });
+    
+        res.json({
+            code: 200,
+            message: "Xoá thành công!",
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Không tồn tại id này!",
+        });
+    }
 };
 
     
