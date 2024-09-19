@@ -163,3 +163,27 @@ module.exports.passwordOtp = async (req, res) => {
         token: token,
     });
 };
+
+// [POST] /api/v1/users/password/reset
+module.exports.passwordReset = async (req, res) => {
+    const token = req.body.token;
+    const password = req.body.password;
+
+    try {
+        await User.updateOne({
+            token: token,
+            deleted: false,
+        }, {
+            password: md5(password),
+        });
+        res.json({
+            code: 200,
+            message: "Đổi mật khẩu thành công!",
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            message: "Không có tài khoản này!",
+        });
+    }
+};
