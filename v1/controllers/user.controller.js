@@ -188,19 +188,21 @@ module.exports.passwordReset = async (req, res) => {
     }
 };
 
-// [GET] /api/v1/users/detail/:id
+// [GET] /api/v1/users/detail
 module.exports.detail = async (req, res) => {
-    const id = req.params.id;
+    // const id = req.params.id;
 
-    // chọn ra các trường không cần bảo mật
-    const user = await User.findOne({
-        _id: id,
-        deleted: false,
-    }).select("fullName email");
+    // // chọn ra các trường không cần bảo mật
+    // const user = await User.findOne({
+    //     _id: id,
+    //     deleted: false,
+    // }).select("fullName email");
+    
+    // Không cần lấy ID nữa vì đã có token lấy từ middlewares quăng lên local
 
     res.json({
         code:200,
-        message:"",
-        user: user,
+        message:"Thông tin user",
+        user: res.locals.user,
     });
 };
