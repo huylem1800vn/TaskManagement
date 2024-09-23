@@ -131,6 +131,10 @@ module.exports.changeMulti = async (req, res) => {
 
 // [POST] /api/v1/tasks/create
 module.exports.create = async (req, res) => {
+
+    // gắn thêm ID để biết ng tạo là ai
+    req.body.createdBy = res.locals.user.id;
+
     const task = new Task(req.body);
     await task.save();
 
