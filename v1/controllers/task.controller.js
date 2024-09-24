@@ -147,6 +147,27 @@ module.exports.create = async (req, res) => {
     // gắn thêm ID để biết ng tạo là ai
     req.body.createdBy = res.locals.user.id;
 
+    if(req.body.taskParentId) {
+        try {
+            const taskCheck = await Task.findOne({
+                _id: req.body.taskParentId,
+            });
+            if(!taskCheck) {
+                res.json({
+                    code: 400,
+                    message: "Task cha không đúng ID",
+                });
+                return;
+            }
+        } catch (error) {
+            res.json({
+                code: 400,
+                message: "Task cha nhiều hơn ID bình thường",
+            });
+            return;
+        }
+    }
+
     const task = new Task(req.body);
     await task.save();
 
